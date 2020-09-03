@@ -22,16 +22,22 @@ let persons = [
         number: "39-23-6423122",
         id: 4        
     }
-  ]
-  app.get('/', (req, res) => {
-    res.send('<h1>Hello World!</h1>')
-  })
-  
-  app.get('/api/persons', (req, res) => {
-    res.json(persons)
-  })
-  
-  const PORT = 3001
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`)
-  })
+]
+
+
+
+
+app.get('/info', (req, res) => {
+    const info =`<div><p>Phonebook has info for ${persons.length} people</p><p> ${new Date().toString()} </div>`
+    
+    res.send(info)
+})
+
+app.get('/api/persons', (req, res) => {
+res.json(persons)
+})
+
+const PORT = 3001
+app.listen(PORT, () => {
+console.log(`Server running on port ${PORT}`)
+})
