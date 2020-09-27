@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 require('dotenv').config()
 
+// tietokanta
 const url = process.env.MONGODB_URI
 
 console.log('connecting to', url)
