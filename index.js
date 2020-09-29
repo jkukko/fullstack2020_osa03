@@ -83,11 +83,12 @@ app.post('/api/persons', (request, response) => {
         })
     }
 
-    const person = {
+    const person = new Person({
         name: body.name,
         number: body.number,
         id: generateId()
-    }
+    })
+
     person.save().then(savedPerson => {
         response.json(savedPerson.toJSON())
     })
@@ -95,6 +96,7 @@ app.post('/api/persons', (request, response) => {
 
 
 const PORT = process.env.PORT
+
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`)
 })
