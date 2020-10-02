@@ -11,36 +11,15 @@ app.use(express.static('build'))
 app.use(morgan(':method :url :status :res[content-length] - :response-time ms :data'))
 app.use(cors())
 
-let persons = [
-    {
-        name:"Arto Hellas",
-        number: "040-123456",
-        id: 1
-    },
-    {
-        name:"Ada Lovelace",
-        number: "39-44-5323523",
-        id: 4
-    },
-    {
-        name:"Dan Abramov",
-        number: "12-43-234345",
-        id: 3
-    },
-    {
-        name:"Mary Poppendieck",
-        number: "39-23-6423122",
-        id: 4        
-    }
-]
-
 morgan.token('data', (request) => request.method === 'POST' ? JSON.stringify(request.body) : ' ')
 
+// get information
 app.get('/info', (req, res) => {
     const info =`<div><p>Phonebook has info for ${persons.length} people</p><p> ${new Date().toString()} </div>`
     res.send(info)
 })
 
+// get all persons
 app.get('/api/persons', (req, res, next) => {
     Person.find({}).then(persons => {
         res.json(persons)
@@ -48,10 +27,16 @@ app.get('/api/persons', (req, res, next) => {
     .catch(error => next(error))
 })
 
-app.get('/api/persons/:id', (request, response) => {
+// get specific person
+app.get('/api/persons/:id', (request, response, next) => {
     Person.findById(request.params.id).then(person => {
-        response.json(person.toJSON())
+        if (person) {
+            response.json(person.toJSON())
+        } else {
+            res.status(204).end()
+        }
     })
+    .catch(error => next(error))
 })
 
 app.delete('/api/persons/:id', (request, response) => {
