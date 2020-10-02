@@ -4,6 +4,7 @@ const app = express()
 const morgan = require('morgan')
 const cors = require('cors')
 const Person = require('./models/person')
+const { response } = require('express')
 
 app.use(express.json()) 
 app.use(express.static('build'))
@@ -66,7 +67,6 @@ const generateId = () => {
 
 app.post('/api/persons', (request, response, next) => {
     const body = request.body
-
     if (!body.name) {
         return response.status(400).json({
             error: 'name missing'
@@ -95,6 +95,20 @@ app.post('/api/persons', (request, response, next) => {
         response.json(savedPerson.toJSON())
     })
     .catch(error => next(error))
+})
+
+
+app.put('/api/persons/:id', (request, response, next) => {
+    const body = request.body
+    const person = {
+        name: body.name,
+        number: body.number
+    }
+    Person.findByIdAndUpdate(request.params.id, person, { new:true })
+        .then(updatedPerson => {
+            response.json(updatedPerson.toJSON())
+        })
+        .catch(error => next(error))
 })
 
 const unknownEndpoint = (request, response) => {
