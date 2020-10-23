@@ -1,6 +1,7 @@
 const mongoose = require('mongoose')
 
-const url = process.env.MONGODB_URI
+//const url = process.env.MONGODB_URI
+const url = 'mongodb+srv://test_admin:QWERTY@cluster0.0bdnt.mongodb.net/puhelinluettole-app?retryWrites=true&w=majority'
 
 console.log('connecting to', url)
 
