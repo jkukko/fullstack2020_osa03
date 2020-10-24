@@ -15,16 +15,21 @@ morgan.token('data', (request) => request.method === 'POST' ? JSON.stringify(req
 
 // get information
 app.get('/info', (req, res) => {
-    const info =`<div><p>Phonebook has info for ${persons.length} people</p><p> ${new Date().toString()} </div>`
-    res.send(info)
+    Person.countDocuments({})
+        .then(personCount => {
+            res.send(`<div><p>Phonebook has info for ${personCount} people</p><p> ${new Date().toString()} </div>`)
+        })
+        .catch(error => next(error))
 })
+
 
 // get all persons
 app.get('/api/persons', (req, res, next) => {
-    Person.find({}).then(persons => {
-        res.json(persons)
-    })
-    .catch(error => next(error))
+    Person.find({})
+        .then(persons => {
+            res.json(persons)
+        })
+        .catch(error => next(error))
 })
 
 // get specific person
@@ -52,29 +57,18 @@ const generateId = () => {
 
 app.post('/api/persons', (request, response, next) => {
     const body = request.body
-
-    if (!body.name) {
-        return response.status(400).json({
-            error: 'name missing'
-        })
-    }
-
-    if (!body.number) {
-        return response.status(400).json({
-            error: 'number missing'
-        })
-    }
-
     const person = new Person({
         name: body.name,
         number: body.number,
         id: generateId()
     })
 
-    person.save().then(savedPerson => {
-        response.json(savedPerson.toJSON())
-    })
-    .catch(error => next(error))
+    person.save()
+        .then(savedPerson => savedPerson.toJSON())
+        .then(savedAndFormattedPerson => {
+            response.json(savedAndFormattedPerson)
+        })
+        .catch(error => next(error))
 })
 
 // testikommentti
@@ -99,8 +93,10 @@ app.use(unknownEndpoint)
 const errorHandler = (error, request, response, next) => {
     console.error(error.message)
   
-    if (error.name === 'CastError') {
+    if (error.name === 'CastError' && error.kind == 'ObjectId') {
       return response.status(400).send({ error: 'malformatted id' })
+    } else if (error.name === 'ValidationError') {
+      return response.status(400).json({ error: error.message })
     }
   
     next(error)
